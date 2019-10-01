@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="0de9ccde-a106-4426-8a48-70e414461d23" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="test_detailsFlow" doc:id="b0f53e10-6422-4905-b1a3-6628cdcc0729" >
+		<http:listener doc:name="/test" doc:id="aa59a715-dfc7-4e81-b3be-490d559f567b" config-ref="HTTP_Listener_config" path="/test">
+		</http:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="d0bb0c6f-f73c-4618-8e1e-63de436563bd" message="Testing My Logger Vk6774 before SetPayload"/>
+		<set-payload value="Payload" doc:name="Success- Started Flow" doc:id="25b7a69b-bd67-40e9-8142-aec83d01b9bc" />
+		<flow-ref doc:name="Flow Reference" doc:id="b165d086-5fde-4f28-b132-723192dbea6e" name="childFlow"/>
+		<set-payload value="Success Main Flow Finished" doc:name="Success - Finished the Flow" doc:id="e3c8a228-b934-414f-94ea-9c7d11878ed3" />
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="5de7735a-353f-42fc-9991-ddb45d7c1203" >
+				<set-payload value="Error occured in main Flow - On Continue Displaying the Main flow error handler" doc:name="Error- Main Flow Error handler" doc:id="2a424fb9-491d-420f-9fb7-831011e33817" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="childFlow" doc:id="8937930c-9338-4fbb-b849-3949612f6c20" >
+		<validation:is-number numberType="INTEGER" doc:name="Is number" doc:id="17a77f3d-3f6f-45e0-a3af-10ab7e091e13" value="#[payload]" message="Validate - Payload is an Integer">
+		</validation:is-number>
+		<logger level="INFO" doc:name="Logger" doc:id="87021815-ac9e-41e4-a169-79a30763682c" message="#[payload ++ '\n This message is Post Validation']" />
+		<set-payload value="Success - Finished Sub Flow" doc:name="Success - Finished Sub Flow" doc:id="51f57ba0-a8c2-49e5-9bac-e424de9b6b27" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="3b903530-8580-4741-a423-af0dbc055d3e" >
+				<set-payload value="Error Occured in Sub Flow" doc:name="Error - Sub Flow" doc:id="dee57f04-5a74-46be-b3c5-25db1d5d35fd" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="testTryScopeDetails" doc:id="12218f10-7f50-4e07-914e-d6f9ebcfd30f" >
+		<http:listener doc:name="GET /testScope" doc:id="35ac67ab-8884-478d-98cc-bee427ddb0a6" config-ref="HTTP_Listener_config" path="/testScope"/>
+		<set-payload value="Success - Started Payload Flow " doc:name="Success - Started Flow" doc:id="cd7e1b6a-f7c9-4bff-a27d-6e83e87a5ce3" />
+		<logger level="INFO" doc:name="Logger" doc:id="6fa07aff-3bc1-43f4-add2-63be667c9f33" message="#[' Message Out of Start flow ' ++ payload]"/>
+		<try doc:name="Try" doc:id="68c0f4c5-4f48-4f65-9268-08f1f3ef188a" >
+			<validation:is-number doc:name="Is number" doc:id="e7203717-f2f6-464a-bac0-7d4b3e292ad6" value="#[payload]" numberType="INTEGER" message="Validate - Payload is an Integer"/>
+			<set-payload value="#[payload]" doc:name="Success - Finished Try Scope" doc:id="66f218cb-bb18-4f30-a3eb-08cfbb970404" />
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c929bacf-739c-43c0-abc9-f38eb5bdcb19" >
+					<set-payload value="Error captured in the Try Scope" doc:name="Error - Try Scope" doc:id="adee4f06-7bba-4a5d-b3e3-d9785a466263" />
+				</on-error-propagate>
+			</error-handler>
+		</try>
+		<set-payload value="Sucessfully Finished Main Flow" doc:name="Sucess - Finished Flow" doc:id="2d2402c3-11f8-4a31-92c9-836d585fba49" />
+	</flow>
+	<flow name="testSpecificErrors" doc:id="e98688ae-30b1-4fef-8cbe-7fcf71382250" initialState="stopped">
+		<http:listener doc:name="Listener" doc:id="9c68aba6-c85e-4856-abf5-b302e009b672" config-ref="HTTP_Listener_config" path="/testSpecificErrors"/>
+		<set-payload value="payload" doc:name="Success - Started Flow" doc:id="96fc39f5-fee2-41af-86b0-6bcb09635b8c" />
+		<validation:is-number numberType="INTEGER" doc:name="Is number" doc:id="07ce4d84-1fe1-43e7-8fed-4c6c814a74c2" value="#[payload]" message="Validate - Payload is an Integer"/>
+		<set-payload value="payload Finish Successfully" doc:name="Success - Finished Flow" doc:id="6be3cf6f-379c-45d3-a475-5f431b6ef43d" />
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="5ea959cf-a678-4e9c-a305-82c4669bbcb1" type="STREAM_MAXIMUM_SIZE_EXCEEDED">
+				<set-payload value="Error Found - Maximum Size Exceeded limit" doc:name="Error - Maximum Size Exceeded" doc:id="a36ac45e-1a81-46d9-bfbc-1e2dd121364e" />
+			</on-error-continue>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="1b7f8706-04d4-4ffe-9760-df9b78eac1a7" type="EXPRESSION">
+				<set-payload value="Expression Error Found" doc:name="Set Payload" doc:id="b43ee4bc-e81b-4317-9fe7-22d17579bad9" />
+			</on-error-continue>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="23f10668-89ee-4854-b9de-2353b56f73d5" type="ANY">
+				<set-payload value="ANY Error Was Invoked." doc:name="Error - Set ANY to capture not available error scopes" doc:id="9a0b6c91-0002-4c83-917c-6d03ac7579bc" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="Copy_of_testSpecificErrors" doc:id="62b8981c-ec46-4d3d-995b-dc9c0a664dfe" >
+		<http:listener doc:name="Copy_of_Listener" doc:id="e3ea0b39-e9f2-46db-8280-8d2c101d03ca" config-ref="HTTP_Listener_config" path="/testSpecificErrors" />
+		<set-payload value="Sucess - Begin Main Flow" doc:name="Copy_of_Success - Started Flow" doc:id="228c1091-a21d-4d25-b6f8-99aa9af7c9aa" />
+		<try doc:name="Try" doc:id="163b3885-5807-46c1-b7f5-e40ac7a2dd56" >
+			<validation:is-number numberType="INTEGER" doc:name="Copy_of_Is number" doc:id="2b415628-f5f6-43e6-9705-9f103b8f7db6" value="#[payload]" message="Validate - Payload is an Integer" />
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="8b34acbd-3cbe-4eaa-96cc-26e95cabeeda" >
+					<set-payload value="Error occured in teh try Scope" doc:name="Error - Set ANY to capture not available error scopes" doc:id="eefd2859-e62a-4286-8b71-bdd9264ef8a3" />
+				</on-error-propagate>
+			</error-handler>
+		</try>
+		<set-payload value="payload Finish Successfully" doc:name="Copy_of_Success - Finished Flow" doc:id="0329a1ea-5588-4dbd-80be-e55c164562e9" />
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="d41fafba-efa6-4269-b246-b5ddbf405de4" >
+				<set-payload value="Error - Main Flow" doc:name="Set Payload" doc:id="a2de07d6-16fe-4454-8724-e0941f6982da" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="errorProcessFlows" doc:id="4071b5a7-4d8a-438d-8489-9efbb67d28b6" >
+		<http:listener doc:name="GET /vk6774Errors" doc:id="57cf7be3-d197-47cf-8eb4-1a0e9d03f5f1" config-ref="HTTP_Listener_config" path="/vk6774Errors"/>
+		<set-payload value="Success - Started Flow Processing" doc:name="Success - Started Flow" doc:id="f321fc60-027a-47a6-aa1a-a8b30be8d266" />
+		<validation:is-number doc:name="Is number" doc:id="77ce81c6-47f2-47e3-97f7-585d89a029cd" value="#[payload]" numberType="INTEGER" message="Validate - Payload is an integer">
+		</validation:is-number>
+		<set-payload value="Success - Finished Flow Processing Completed Voila!!" doc:name="Success - Finished Flow" doc:id="ba748fcb-f0db-4e30-9d00-b7ad5a06431a" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="9934d55b-f2ea-463f-a7fb-bb6fcfab605e" type="STREAM_MAXIMUM_SIZE_EXCEEDED">
+				<set-payload value="Error - Max Size Exceeded" doc:name="Error - Max Size Exceeded" doc:id="962f4063-030f-4c82-8225-dbd0229bde54" />
+			</on-error-continue>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="39741213-baa8-4f45-9b1c-46eb1942bc1a" type="EXPRESSION">
+				<set-payload value="Error - Invalid Number" doc:name="Error - Expression" doc:id="77613e8f-f176-4d57-9014-dbd0d909b507" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="test_detailsFlow1" doc:id="1e958523-bb77-4e28-bb1a-acbf763609a0" >
+		<http:listener doc:name="Listener" doc:id="c2a97095-98a5-40ac-a10a-26be798d68d4" config-ref="HTTP_Listener_config" path="/myTestVk6774"/>
+		<set-variable value="#[attributes.queryParams]" doc:name="Set Variable" doc:id="5d7af272-374c-4562-be2e-e04667c54448" variableName="varType"/>
+		<logger level="INFO" doc:name="Logger" doc:id="a5f0a775-e4c0-4bf8-879b-440ddd56fc82" message="#[vars.varType]"/>
+	</flow>
+</mule>

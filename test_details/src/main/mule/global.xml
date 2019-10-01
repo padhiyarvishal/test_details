@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<configuration doc:name="Configuration" doc:id="5a908f71-abd1-4e7a-92cd-4d249eea9a62" defaultErrorHandler-ref="globalError_Handler" />
+	<error-handler name="globalError_Handler" doc:id="b2de7782-1ccd-4c68-8b33-a55c4f5d583b" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="31382963-aca8-4770-bf61-b053bd9a0cfa" >
+			<set-payload value="Error Global Handler - Error Occured in Main Flow Payload Vk6774" doc:name="Error Global Handler" doc:id="d068accb-5420-41b0-98d4-39d0965246de" />
+		</on-error-propagate>
+	</error-handler>
+</mule>
